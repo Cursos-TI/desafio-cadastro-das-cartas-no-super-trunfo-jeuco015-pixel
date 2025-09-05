@@ -1,0 +1,145 @@
+Desafio cartas Aluno Jonathan.c
+
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    // Estruturas das cartas
+    char estado1[3], codigo1[10], cidade1[30];
+    int populacao1, pontos_turisticos1;
+    float area1, pib1, densidade1, pib_percapita1;
+
+    char estado2[3], codigo2[10], cidade2[30];
+    int populacao2, pontos_turisticos2;
+    float area2, pib2, densidade2, pib_percapita2;
+
+    // Entrada da Carta 1
+    printf("Cadastro da Carta 1\n");
+    printf("Estado (sigla): ");
+    scanf("%s", estado1);
+    printf("Codigo da carta: ");
+    scanf("%s", codigo1);
+    printf("Cidade: ");
+    scanf("%s", cidade1);
+    printf("Populacao: ");
+    scanf("%d", &populacao1);
+    printf("Area (km2): ");
+    scanf("%f", &area1);
+    printf("PIB: ");
+    scanf("%f", &pib1);
+    printf("Pontos turisticos: ");
+    scanf("%d", &pontos_turisticos1);
+
+    densidade1 = populacao1 / area1;
+    pib_percapita1 = pib1 / populacao1;
+
+    // Entrada da Carta 2
+    printf("\nCadastro da Carta 2\n");
+    printf("Estado (sigla): ");
+    scanf("%s", estado2);
+    printf("Codigo da carta: ");
+    scanf("%s", codigo2);
+    printf("Cidade: ");
+    scanf("%s", cidade2);
+    printf("Populacao: ");
+    scanf("%d", &populacao2);
+    printf("Area (km2): ");
+    scanf("%f", &area2);
+    printf("PIB: ");
+    scanf("%f", &pib2);
+    printf("Pontos turisticos: ");
+    scanf("%d", &pontos_turisticos2);
+
+    densidade2 = populacao2 / area2;
+    pib_percapita2 = pib2 / populacao2;
+
+    // -------------------------------
+    // Escolha dos atributos
+    // -------------------------------
+    int opcao1, opcao2;
+    printf("\nEscolha o PRIMEIRO atributo para comparacao:\n");
+    printf("1 - Populacao\n");
+    printf("2 - Area\n");
+    printf("3 - PIB\n");
+    printf("4 - Densidade Populacional\n");
+    printf("5 - PIB per Capita\n");
+    printf("Opcao: ");
+    scanf("%d", &opcao1);
+
+    printf("\nEscolha o SEGUNDO atributo para comparacao (diferente do primeiro):\n");
+    for (int i = 1; i <= 5; i++) {
+        if (i != opcao1) {
+            switch (i) {
+                case 1: printf("1 - Populacao\n"); break;
+                case 2: printf("2 - Area\n"); break;
+                case 3: printf("3 - PIB\n"); break;
+                case 4: printf("4 - Densidade Populacional\n"); break;
+                case 5: printf("5 - PIB per Capita\n"); break;
+            }
+        }
+    }
+    printf("Opcao: ");
+    scanf("%d", &opcao2);
+
+    if (opcao1 == opcao2) {
+        printf("\nErro: nao pode escolher o mesmo atributo duas vezes!\n");
+        return 1;
+    }
+
+    // -------------------------------
+    // Função auxiliar de comparação
+    // -------------------------------
+    float valor1_attr1, valor2_attr1, valor1_attr2, valor2_attr2;
+    char nome_attr1[30], nome_attr2[30];
+
+    // Definir valores do primeiro atributo
+    switch (opcao1) {
+        case 1: valor1_attr1 = populacao1; valor2_attr1 = populacao2; strcpy(nome_attr1, "Populacao"); break;
+        case 2: valor1_attr1 = area1; valor2_attr1 = area2; strcpy(nome_attr1, "Area"); break;
+        case 3: valor1_attr1 = pib1; valor2_attr1 = pib2; strcpy(nome_attr1, "PIB"); break;
+        case 4: valor1_attr1 = densidade1; valor2_attr1 = densidade2; strcpy(nome_attr1, "Densidade"); break;
+        case 5: valor1_attr1 = pib_percapita1; valor2_attr1 = pib_percapita2; strcpy(nome_attr1, "PIB per Capita"); break;
+        default: printf("\nOpcao invalida!\n"); return 1;
+    }
+
+    // Definir valores do segundo atributo
+    switch (opcao2) {
+        case 1: valor1_attr2 = populacao1; valor2_attr2 = populacao2; strcpy(nome_attr2, "Populacao"); break;
+        case 2: valor1_attr2 = area1; valor2_attr2 = area2; strcpy(nome_attr2, "Area"); break;
+        case 3: valor1_attr2 = pib1; valor2_attr2 = pib2; strcpy(nome_attr2, "PIB"); break;
+        case 4: valor1_attr2 = densidade1; valor2_attr2 = densidade2; strcpy(nome_attr2, "Densidade"); break;
+        case 5: valor1_attr2 = pib_percapita1; valor2_attr2 = pib_percapita2; strcpy(nome_attr2, "PIB per Capita"); break;
+        default: printf("\nOpcao invalida!\n"); return 1;
+    }
+
+    // -------------------------------
+    // Comparação e soma
+    // -------------------------------
+    // Para densidade: vence o menor valor
+    float soma1 = valor1_attr1 + valor1_attr2;
+    float soma2 = valor2_attr1 + valor2_attr2;
+
+    printf("\nComparacao de cartas:\n");
+    printf("Carta 1 - %s (%s)\n", cidade1, estado1);
+    printf("Carta 2 - %s (%s)\n\n", cidade2, estado2);
+
+    printf("Atributo 1: %s\n", nome_attr1);
+    printf(" -> %s: %.2f | %s: %.2f\n\n", cidade1, valor1_attr1, cidade2, valor2_attr1);
+
+    printf("Atributo 2: %s\n", nome_attr2);
+    printf(" -> %s: %.2f | %s: %.2f\n\n", cidade1, valor1_attr2, cidade2, valor2_attr2);
+
+    printf("Somas:\n");
+    printf(" -> %s: %.2f\n", cidade1, soma1);
+    printf(" -> %s: %.2f\n\n", cidade2, soma2);
+
+    // Decisão final
+    if (soma1 > soma2)
+        printf("Resultado: Carta 1 (%s) venceu!\n", cidade1);
+    else if (soma2 > soma1)
+        printf("Resultado: Carta 2 (%s) venceu!\n", cidade2);
+    else
+        printf("Resultado: Empate!\n");
+
+    return 0;
+}

@@ -1,0 +1,175 @@
+#include <stdio.h>
+#include <string.h>
+
+#define BOARD_N 10      
+#define MASK_N  7       
+
+// Códigos visuais solicitados
+#define AGUA 0
+#define NAVIO 3
+#define HABIL 5
+
+// ---------- Utilidades de tabuleiro ----------
+
+void init_board(int board[BOARD_N][BOARD_N]) {
+    for (int i = 0; i < BOARD_N; i++) {
+        for (int j = 0; j < BOARD_N; j++) {
+            board[i][j] = AGUA;
+        }
+    }
+}
+
+void place_sample_ships(int board[BOARD_N][BOARD_N]) {
+    // Coloca alguns navios (valor 3) fixos para visualização
+    // Navio horizontal
+    for (int c = 2; c <= 5; c++) board[1][c] = NAVIO;
+    // Navio vertical
+    for (int r = 4; r <= 8; r++) board[r][7] = NAVIO;
+    // Navio único
+    board[6][2] = NAVIO;
+}
+
+void print_board(int board[BOARD_N][BOARD_N]) {
+    printf("\nLegenda: 0=Água  3=Navio  5=Área da habilidade\n\n");
+    for (int i = 0; i < BOARD_N; i++) {
+        for (int j = 0; j < BOARD_N; j++) {
+            printf("%d ", board[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+
+void build_mask_cone(int mask[MASK_N][MASK_N]) {
+   
+    int mid = MASK_N / 2;
+
+    for (int r = 0; r < MASK_N; r++) {
+        for (int c = 0; c < MASK_N; c++) {
+            
+            int dx = c - mid;
+
+          
+            int half_width = r;
+            if (half_width > mid) half_width = mid;
+
+            if (dx >= -half_width && dx <= half_width) {
+                mask[r][c] = 1;
+            } else {
+                mask[r][c] = 0;
+            }
+        }
+    }
+
+}
+
+void build_mask_cross(int mask[MASK_N][MASK_N]) {
+   
+    int mid = MASK_N / 2;
+    for (int r = 0; r < MASK_N; r++) {
+        for (int c = 0; c < MASK_N; c++) {
+        
+            if (r == mid || c == mid) {
+                mask[r][c] = 1;
+            } else {
+                mask[r][c] = 0;
+            }
+        }
+    }
+}
+
+void build_mask_octahedron(int mask[MASK_N][MASK_N]) {
+   
+    int mid = MASK_N / 2;
+    int radius = mid; 
+
+    for (int r = 0; r < MASK_N; r++) {
+        for (int c = 0; c < MASK_N; c++) {
+            int manhattan = (r > mid ? r - mid : mid - r) + (c > mid ? c - mid : mid - c);
+            if (manhattan <= radius) {
+                mask[r][c] = 1;
+            } else {
+                mask[r][c] = 0;
+            }
+        }
+    }
+}
+
+
+void overlay_mask_on_board(
+    int board[BOARD_N][BOARD_N],
+    int mask[MASK_N][MASK_N],
+    int anchor_r, int anchor_c,     
+    int row0, int col0            
+) {
+    
+    int start_r = row0 - anchor_r;
+    int start_c = col0 - anchor_c;
+
+    for (int r = 0; r < MASK_N; r++) {
+        for (int c = 0; c < MASK_N; c++) {
+            if (mask[r][c] == 1) {
+                int br = start_r + r; 
+                int bc = start_c + c; 
+
+                
+                if (br >= 0 && br < BOARD_N && bc >= 0 && bc < BOARD_N) {
+                  
+                    if (board[br][bc] != NAVIO) {
+                        board[br][bc] = HABIL;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void print_mask(const char *title, int mask[MASK_N][MASK_N]) {
+    printf("%s (1=afetado, 0=neutro):\n", title);
+    for (int r = 0; r < MASK_N; r++) {
+        for (int c = 0; c < MASK_N; c++) {
+            printf("%d ", mask[r][c]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+int main(void) {
+    int board[BOARD_N][BOARD_N];
+    int cone[MASK_N][MASK_N];
+    int cross[MASK_N][MASK_N];
+    int octa[MASK_N][MASK_N];
+
+    // 1) Tabuleiro base
+    init_board(board);
+    place_sample_ships(board);
+
+    // 2) Construção dinâmica das matrizes de habilidade 
+    build_mask_cross(cross);
+    build_mask_octahedron(octa);
+
+
+    int mid = MASK_N / 2;
+
+    
+    int cone_origin_r = 2, cone_origin_c = 2;
+    
+    int cross_origin_r = 5, cross_origin_c = 5;
+    
+    int octa_origin_r = 7, octa_origin_c = 3;
+
+    
+    overlay_mask_on_board(board, cone, /*anchor*/ 0, mid, cone_origin_r, cone_origin_c);
+    overlay_mask_on_board(board, cross, /*anchor*/ mid, mid, cross_origin_r, cross_origin_c);
+    overlay_mask_on_board(board, octa, /*anchor*/ mid, mid, octa_origin_r, octa_origin_c);
+
+    
+    // 5) Exibir o tabuleiro final
+    printf("Tabuleiro com navios e áreas de efeito:\n");
+    print_board(board);
+
+    return 0;
+}
